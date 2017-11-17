@@ -1,0 +1,41 @@
+language: android
+jdk: oraclejdk8
+
+before_cache:
+	- rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
+	- rm -rf $HOME/.gradle/caches/*/plugin-resolution/
+
+cache:
+	directories:
+		- $HOME/.gradle/caches/
+		- $HOME/.gradle/wrapper/
+
+env:
+	global:
+		- ANDROID_API_LEVEL=27
+		- ANDROID_BUILD_TOOLS_VERSION=27.0.1
+
+android:
+	update_sdk: true
+	components:
+		- tools
+		- platform-tools
+		- build-tools-$ANDROID_BUILD_TOOLS_VERSION
+		- android-$ANDROID_API_LEVEL
+		- extra-google-m2repository
+		- extra-android-m2repository
+		- extra-google-google_play_services
+		- extra-android-support
+		- addon-google_apis-google-$ANDROID_API_LEVEL
+	licenses:
+		- 'android-sdk-preview-license-.+'
+		- 'android-sdk-license-.+'
+		- 'google-sdk-license.+'
+
+before_script:
+	- mkdir -p "$ANDROID_HOME/licenses"
+	- cp ./google-licenses/* "$ANDROID_HOME/licenses/"
+	- chmod +x gradlew
+
+script:
+	- ./gradlew build
