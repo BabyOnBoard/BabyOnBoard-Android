@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/navigation_bodysigns"
+        android:icon="@drawable/ic_bodysigns"
+        android:title="@string/title_bodysigns" />
+
+    <item
+        android:id="@+id/navigation_babycrib"
+        android:icon="@drawable/ic_babycrib"
+        android:title="@string/title_babycrib" />
+
+    <item
+        android:id="@+id/navigation_connection"
+        android:icon="@drawable/ic_wifi"
+        android:title="@string/title_connection" />
+</menu>

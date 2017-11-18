@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">Baby on Board</string>
+
+    <!-- Bottom Menu -->
+    <string name="title_bodysigns">Sinais Vitais</string>
+    <string name="title_babycrib">Berço</string>
+    <string name="title_connection">Conexão</string>
 </resources>
