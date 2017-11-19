@@ -15,4 +15,7 @@
     <string name="description_ic_heartbeats">Heartbeats icon</string>
     <string name="description_ic_thermometer">Thermometer icon</string>
     <string name="description_ic_breathing">Breathing icon</string>
+    <string name="description_ic_vibration_movement">Movimento de vibração</string>
+    <string name="description_ic_front_movement">Movimento frontal</string>
+    <string name="description_ic_side_movementg">Movimento lateral</string>
 </resources>
