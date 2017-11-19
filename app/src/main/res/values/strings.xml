@@ -5,4 +5,14 @@
     <string name="title_bodysigns">Sinais Vitais</string>
     <string name="title_babycrib">Berço</string>
     <string name="title_connection">Conexão</string>
+
+    <!-- Fake data to test view elements -->
+    <string name="example_heartbeats">80 bpm</string>
+    <string name="example_temperature">30.5 ºC</string>
+    <string name="example_breathing">Respirando</string>
+
+    <!-- Images and icons description -->
+    <string name="description_ic_heartbeats">Heartbeats icon</string>
+    <string name="description_ic_thermometer">Thermometer icon</string>
+    <string name="description_ic_breathing">Breathing icon</string>
 </resources>
