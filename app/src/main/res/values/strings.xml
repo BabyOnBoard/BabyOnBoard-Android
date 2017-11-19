@@ -18,4 +18,11 @@
     <string name="description_ic_vibration_movement">Movimento de vibração</string>
     <string name="description_ic_front_movement">Movimento frontal</string>
     <string name="description_ic_side_movementg">Movimento lateral</string>
+    <string name="description_ic_wifi">Conectar ao berço</string>
+
+    <!-- Hints -->
+    <string name="ip_address">Identificação do Berço</string>
+
+    <!-- Buttons -->
+    <string name="connect">Conectar</string>
 </resources>
