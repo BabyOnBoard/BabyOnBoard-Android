@@ -14,9 +14,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.jonathanrufino.babyonboard.R;
+import com.jonathanrufino.babyonboard.model.Heartbeats;
+import com.jonathanrufino.babyonboard.model.Temperature;
 import com.jonathanrufino.babyonboard.networking.APIClient;
 import com.jonathanrufino.babyonboard.networking.APIInterface;
-import com.jonathanrufino.babyonboard.model.Temperature;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -25,12 +26,13 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class BodySignsFragment  extends Fragment {
+public class BodySignsFragment extends Fragment {
 
     @SuppressWarnings("unused")
-    public static final String TAG  = BodySignsFragment.class.getSimpleName();
+    public static final String TAG = BodySignsFragment.class.getSimpleName();
 
     private WebView streamingWV;
+    private TextView heartbeatsTV;
     private TextView temperatureTV;
 
     private APIInterface apiInterface;
@@ -41,6 +43,7 @@ public class BodySignsFragment  extends Fragment {
         View view = inflater.inflate(R.layout.fragment_bodysigns, container, false);
 
         streamingWV = view.findViewById(R.id.wv_streaming);
+        heartbeatsTV = view.findViewById(R.id.tv_heartbeats);
         temperatureTV = view.findViewById(R.id.tv_temperature);
 
         apiInterface = APIClient.getClient().create(APIInterface.class);
@@ -64,6 +67,25 @@ public class BodySignsFragment  extends Fragment {
                 handler.post(new Runnable() {
                     public void run() {
                         try {
+                            Call<Heartbeats> callHeartbeats = apiInterface.getHeartbeats();
+                            callHeartbeats.enqueue(new Callback<Heartbeats>() {
+                                @Override
+                                public void onResponse(@NonNull Call<Heartbeats> call, @NonNull Response<Heartbeats> response) {
+                                    Heartbeats heartbeats = response.body();
+                                    if (heartbeats != null) {
+                                        heartbeatsTV.setText(String.format("%s bpm", String.valueOf(heartbeats.getBeats())));
+                                    } else {
+                                        Toast.makeText(getActivity(), "Não existem registros de batimentos cardíacos.", Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+
+                                @Override
+                                public void onFailure(@NonNull Call<Heartbeats> call, @NonNull Throwable t) {
+                                    Toast.makeText(getActivity(), "Não foi possível conectar ao berço.", Toast.LENGTH_SHORT).show();
+
+                                }
+                            });
+
                             Call<Temperature> callTemperature = apiInterface.getTemperature();
                             callTemperature.enqueue(new Callback<Temperature>() {
                                 @Override
