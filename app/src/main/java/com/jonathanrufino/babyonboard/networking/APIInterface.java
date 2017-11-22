@@ -1,5 +1,6 @@
 package com.jonathanrufino.babyonboard.networking;
 
+import com.jonathanrufino.babyonboard.model.Breathing;
 import com.jonathanrufino.babyonboard.model.Heartbeats;
 import com.jonathanrufino.babyonboard.model.Temperature;
 
@@ -13,4 +14,7 @@ public interface APIInterface {
 
     @GET("/api/v1/temperature/")
     Call<Temperature> getTemperature();
+
+    @GET("/api/v1/breathing/")
+    Call<Breathing> getBreathing();
 }

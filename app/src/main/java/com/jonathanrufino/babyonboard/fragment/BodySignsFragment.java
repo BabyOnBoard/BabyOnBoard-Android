@@ -14,6 +14,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.jonathanrufino.babyonboard.R;
+import com.jonathanrufino.babyonboard.model.Breathing;
 import com.jonathanrufino.babyonboard.model.Heartbeats;
 import com.jonathanrufino.babyonboard.model.Temperature;
 import com.jonathanrufino.babyonboard.networking.APIClient;
@@ -34,6 +35,7 @@ public class BodySignsFragment extends Fragment {
     private WebView streamingWV;
     private TextView heartbeatsTV;
     private TextView temperatureTV;
+    private TextView breathingTV;
 
     private APIInterface apiInterface;
 
@@ -45,6 +47,7 @@ public class BodySignsFragment extends Fragment {
         streamingWV = view.findViewById(R.id.wv_streaming);
         heartbeatsTV = view.findViewById(R.id.tv_heartbeats);
         temperatureTV = view.findViewById(R.id.tv_temperature);
+        breathingTV = view.findViewById(R.id.tv_breathing);
 
         apiInterface = APIClient.getClient().create(APIInterface.class);
 
@@ -101,6 +104,28 @@ public class BodySignsFragment extends Fragment {
                                 @Override
                                 public void onFailure(@NonNull Call<Temperature> call, @NonNull Throwable t) {
                                     Toast.makeText(getActivity(), "Não foi possível conectar ao berço", Toast.LENGTH_SHORT).show();
+                                }
+                            });
+
+                            Call<Breathing> callBreathing = apiInterface.getBreathing();
+                            callBreathing.enqueue(new Callback<Breathing>() {
+                                @Override
+                                public void onResponse(@NonNull Call<Breathing> call, @NonNull Response<Breathing> response) {
+                                    Breathing breathing = response.body();
+                                    if (breathing != null) {
+                                        if (breathing.isBreathing()) {
+                                            breathingTV.setText("Respirando");
+                                        } else {
+                                            breathingTV.setText("Sem Respiração");
+                                        }
+                                    } else {
+                                        Toast.makeText(getActivity(), "Não existem registros de respiração.", Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+
+                                @Override
+                                public void onFailure(@NonNull Call<Breathing> call, @NonNull Throwable t) {
+                                    Toast.makeText(getActivity(), "Não foi possível conectar ao berço.", Toast.LENGTH_SHORT).show();
                                 }
                             });
                         } catch (Exception e) {
