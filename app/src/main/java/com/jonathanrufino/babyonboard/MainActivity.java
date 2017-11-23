@@ -7,6 +7,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 
+import com.jonathanrufino.babyonboard.fragment.BabyCribFragment;
 import com.jonathanrufino.babyonboard.fragment.BodySignsFragment;
 
 public class MainActivity extends AppCompatActivity {
@@ -26,6 +27,7 @@ public class MainActivity extends AppCompatActivity {
                         transaction.replace(R.id.main_container, new BodySignsFragment(), BodySignsFragment.TAG).commit();
                         return true;
                     case R.id.navigation_babycrib:
+                        transaction.replace(R.id.main_container, new BabyCribFragment(), BodySignsFragment.TAG).commit();
                         return true;
                     case R.id.navigation_connection:
                         return true;
