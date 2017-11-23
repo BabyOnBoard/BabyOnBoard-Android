@@ -25,4 +25,10 @@
 
     <!-- Buttons -->
     <string name="connect">Conectar</string>
+    <string name="start">Iniciar</string>
+    <string name="cancel">Cancelar</string>
+
+    <!-- Texts -->
+    <string name="start_movement">Movimentar Berço</string>
+    <string name="duration_time">Selecione o tempo de duração do movimento.</string>
 </resources>
