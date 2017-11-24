@@ -12,7 +12,7 @@ import android.widget.NumberPicker;
 import android.widget.Toast;
 
 import com.jonathanrufino.babyonboard.R;
-import com.jonathanrufino.babyonboard.TimerDialog;
+import com.jonathanrufino.babyonboard.view.TimerDialog;
 import com.jonathanrufino.babyonboard.model.BabyCrib;
 import com.jonathanrufino.babyonboard.networking.APIClient;
 import com.jonathanrufino.babyonboard.networking.APIInterface;

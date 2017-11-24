@@ -1,4 +1,4 @@
-package com.jonathanrufino.babyonboard;
+package com.jonathanrufino.babyonboard.view;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -7,6 +7,8 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.widget.NumberPicker;
+
+import com.jonathanrufino.babyonboard.R;
 
 public class TimerDialog extends DialogFragment {
 
