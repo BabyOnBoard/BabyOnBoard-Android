@@ -31,4 +31,10 @@
     <!-- Texts -->
     <string name="start_movement">Movimentar Berço</string>
     <string name="duration_time">Selecione o tempo de duração do movimento.</string>
+
+    <!-- External files -->
+    <string name="preferences_file">shared_prefs</string>
+
+    <!-- Messages -->
+    <string name="empty_ip">Informe o IP do berço.</string>
 </resources>
