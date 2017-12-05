@@ -168,6 +168,9 @@ public class MainActivity extends AppCompatActivity implements IFeedback {
                     .setNeutralButton("OK", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
+                            noiseSamples.remove();
+                            noiseSamples.remove();
+                            noiseSamples.remove();
                             isRunning = false;
                         }
                     });
