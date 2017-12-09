@@ -3,6 +3,7 @@ package com.jonathanrufino.babyonboard.networking;
 import com.jonathanrufino.babyonboard.model.BabyCrib;
 import com.jonathanrufino.babyonboard.model.Breathing;
 import com.jonathanrufino.babyonboard.model.Heartbeats;
+import com.jonathanrufino.babyonboard.model.Movement;
 import com.jonathanrufino.babyonboard.model.Noise;
 import com.jonathanrufino.babyonboard.model.Temperature;
 
@@ -26,7 +27,7 @@ public interface APIInterface {
     Call<Noise> getNoise();
 
     @GET("/api/v1/movement/")
-    Call<BabyCrib> getMovement();
+    Call<Movement> getMovement();
 
     @POST("/api/v1/movement/")
     Call<BabyCrib> setMovement(@Body BabyCrib babyCrib);

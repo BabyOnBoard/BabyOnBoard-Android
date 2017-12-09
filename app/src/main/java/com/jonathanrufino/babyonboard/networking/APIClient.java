@@ -5,13 +5,12 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class APIClient {
 
-    private static final String BASE_URL = "http://0.0.0.0:8000";
     private static Retrofit retrofit = null;
 
-    public static Retrofit getClient() {
+    public static Retrofit getClient(String apiBaseURL) {
         if (retrofit == null) {
             retrofit = new Retrofit.Builder()
-                    .baseUrl(BASE_URL)
+                    .baseUrl(String.format("http://%s:8000", apiBaseURL))
                     .addConverterFactory(GsonConverterFactory.create())
                     .build();
         }
