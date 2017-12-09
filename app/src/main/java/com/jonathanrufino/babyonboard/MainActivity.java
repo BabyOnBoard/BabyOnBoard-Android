@@ -7,7 +7,6 @@ import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
@@ -21,7 +20,8 @@ import com.jonathanrufino.babyonboard.fragment.ConnectionFragment;
 import com.jonathanrufino.babyonboard.model.Noise;
 import com.jonathanrufino.babyonboard.networking.APIClient;
 import com.jonathanrufino.babyonboard.networking.APIInterface;
-import com.jonathanrufino.babyonboard.view.IFeedback;
+import com.jonathanrufino.babyonboard.util.IFeedback;
+import com.jonathanrufino.babyonboard.util.SharedPreferencesHelper;
 
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -40,11 +40,12 @@ public class MainActivity extends AppCompatActivity implements IFeedback {
 
     private ProgressBar progressBar;
 
-    private Queue<Noise> noiseSamples;
     private APIInterface apiInterface;
-    private Noise lastNoiseRegistry = new Noise(0, false, "", "");
+    private Queue<Noise> noiseSamples;
+    private Noise lastNoiseRegistry = new Noise(0, false, "");
     private boolean isRunning = false;
     private Timer timer;
+    private String ip;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,16 +58,15 @@ public class MainActivity extends AppCompatActivity implements IFeedback {
         navigation.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
                 switch (item.getItemId()) {
                     case R.id.navigation_bodysigns:
-                        transaction.replace(R.id.main_container, new BodySignsFragment(), BodySignsFragment.TAG).commit();
+                        displayFragment(new BodySignsFragment());
                         return true;
                     case R.id.navigation_babycrib:
-                        transaction.replace(R.id.main_container, new BabyCribFragment(), BodySignsFragment.TAG).commit();
+                        displayFragment(new BabyCribFragment());
                         return true;
                     case R.id.navigation_connection:
-                        transaction.replace(R.id.main_container, new ConnectionFragment(), BodySignsFragment.TAG).commit();
+                        displayFragment(new ConnectionFragment());
                         return true;
                 }
                 return false;
@@ -78,24 +78,31 @@ public class MainActivity extends AppCompatActivity implements IFeedback {
     protected void onStart() {
         super.onStart();
 
-        String ip = SharedPreferencesHelper.getSharedPreferenceString(this, "ip", "");
+        showProgress();
 
-        if (ip.isEmpty()) {
-            showFragment(ConnectionFragment.TAG);
+        ip = SharedPreferencesHelper.getSharedPreferenceString(this, getApplicationContext().getString(R.string.shared_pref_ip), "");
+
+        if (ip == null || ip.isEmpty()) {
+            displayFragment(new ConnectionFragment());
         } else {
-            showFragment(BodySignsFragment.TAG);
+            displayFragment(new BodySignsFragment());
+
+            apiInterface = APIClient.getClient(ip).create(APIInterface.class);
+            startNoiseAquisition();
         }
 
-        noiseSamples = new LinkedList<>();
-        noiseSamples.add(new Noise(0, false, "00/00/00", "00:00"));
-        noiseSamples.add(new Noise(0, false, "00/00/00", "00:00"));
-        noiseSamples.add(new Noise(0, false, "00/00/00", "00:00"));
+        hideProgress();
+    }
 
-        apiInterface = APIClient.getClient().create(APIInterface.class);
+    private void startNoiseAquisition() {
+        noiseSamples = new LinkedList<>();
+        noiseSamples.add(new Noise(0, false, "00/00/00"));
+        noiseSamples.add(new Noise(0, false, "00/00/00"));
+        noiseSamples.add(new Noise(0, false, "00/00/00"));
 
         final Handler handler = new Handler();
         timer = new Timer();
-        TimerTask doAsynchronousTask = new TimerTask() {
+        TimerTask requestTask = new TimerTask() {
             @Override
             public void run() {
                 if (!isRunning) {
@@ -105,32 +112,43 @@ public class MainActivity extends AppCompatActivity implements IFeedback {
                                 Call<Noise> callNoise = apiInterface.getNoise();
                                 callNoise.enqueue(new Callback<Noise>() {
                                     @Override
-                                    public void onResponse(@NonNull Call<Noise> call, @NonNull Response<Noise> response) {
+                                    public void onResponse(@NonNull Call<Noise> call,
+                                                           @NonNull Response<Noise> response) {
                                         Noise noise = response.body();
 
-                                        if (noise != null) {
+                                        if (noise != null && noise.getDatetime() != null) {
                                             analyzeNoise(noise);
-                                        } else {
-                                            Toast.makeText(getApplicationContext(), "Não existem registros de ruído", Toast.LENGTH_SHORT).show();
                                         }
                                     }
 
                                     @Override
-                                    public void onFailure(@NonNull Call<Noise> call, @NonNull Throwable t) {
-                                        Toast.makeText(getApplicationContext(), "Não foi possível conectar ao berço", Toast.LENGTH_SHORT).show();
-                                        // TODO Implementar uma forma de voltar
-                                        // a realizar a requisição após conectar ao berço
+                                    public void onFailure(@NonNull Call<Noise> call,
+                                                          @NonNull Throwable t) {
+                                        timer.cancel();
+
+                                        AlertDialog.Builder builder = new AlertDialog.Builder(
+                                                MainActivity.this)
+                                                .setTitle("Falha na conexão")
+                                                .setMessage("Não foi possível conectar com o berço. Verifique se a identificação informada está correta ou se o berço está ligado.")
+                                                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                                    @Override
+                                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                                        dialogInterface.dismiss();
+                                                    }
+                                                });
+                                        AlertDialog alert = builder.create();
+                                        alert.show();
                                     }
                                 });
                             } catch (Exception e) {
-                                Toast.makeText(getApplicationContext(), "Ocorreu um erro, tente novamente", Toast.LENGTH_SHORT).show();
+                                showToast("Ocorreu um erro, tente novamente");
                             }
                         }
                     });
                 }
             }
         };
-        timer.schedule(doAsynchronousTask, 0, 5000);
+        timer.schedule(requestTask, 0, 5000);
     }
 
     private void analyzeNoise(Noise newSample) {
@@ -181,27 +199,8 @@ public class MainActivity extends AppCompatActivity implements IFeedback {
         }
     }
 
-    private void showFragment(String tag) {
-        FragmentManager fm = getSupportFragmentManager();
-        FragmentTransaction ft = fm.beginTransaction();
-        Fragment fragment = fm.findFragmentByTag(tag);
-
-        if (fragment == null) {
-            if (tag.equals(BodySignsFragment.TAG)) {
-                fragment = new BodySignsFragment();
-            } else if (tag.equals(BabyCribFragment.TAG)) {
-                fragment = new BabyCribFragment();
-            } else if (tag.equals(ConnectionFragment.TAG)) {
-                fragment = new ConnectionFragment();
-            }
-        }
-
-        ft.replace(R.id.main_container, fragment, tag);
-        ft.commit();
-    }
-
     @Override
-    public void showMessage(String message) {
+    public void showToast(String message) {
         Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
     }
 
@@ -213,5 +212,24 @@ public class MainActivity extends AppCompatActivity implements IFeedback {
     @Override
     public void hideProgress() {
         progressBar.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void displayFragment(Fragment fragment) {
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        ft.replace(R.id.main_container, fragment);
+        ft.commit();
+    }
+
+    @Override
+    public void notifyIPChanged() {
+        ip = SharedPreferencesHelper.getSharedPreferenceString(this, getApplicationContext().getString(R.string.shared_pref_ip), "");
+
+        if (ip == null || ip.isEmpty()) {
+            timer.cancel();
+        } else {
+            apiInterface = APIClient.getClient(ip).create(APIInterface.class);
+            startNoiseAquisition();
+        }
     }
 }
