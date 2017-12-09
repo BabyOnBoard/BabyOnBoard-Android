@@ -19,8 +19,8 @@ public class TimerDialog extends DialogFragment {
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         final NumberPicker numberPicker = new NumberPicker(getActivity());
         numberPicker.setMinValue(1);
-        numberPicker.setMaxValue(10);
-        numberPicker.setValue(5);
+        numberPicker.setMaxValue(4);
+        numberPicker.setValue(1);
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setView(numberPicker)
