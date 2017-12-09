@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/colorPrimary"
@@ -10,6 +11,7 @@
         android:id="@+id/iv_wifi"
         android:layout_width="160dp"
         android:layout_height="160dp"
+        android:layout_marginBottom="32dp"
         android:contentDescription="@string/description_ic_wifi"
         app:layout_constraintBottom_toTopOf="@id/til_ip_address"
         app:layout_constraintLeft_toLeftOf="parent"
@@ -20,7 +22,6 @@
         android:id="@+id/til_ip_address"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
         android:background="@android:color/transparent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
@@ -31,17 +32,30 @@
             android:id="@+id/et_ip_address"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:digits="0123456789:."
             android:gravity="center"
             android:hint="@string/ip_address"
-            android:inputType="number" />
+            android:imeOptions="actionGo"
+            android:inputType="textUri" />
     </android.support.design.widget.TextInputLayout>
+
+    <TextView
+        android:id="@+id/connected_tv"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:gravity="center"
+        android:textSize="30sp"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/iv_wifi"
+        tools:text="@string/example_ip" />
 
     <Button
         android:id="@+id/connect_b"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
+        android:layout_marginBottom="16dp"
         android:background="@color/colorAccent"
         android:text="@string/connect"
-        app:layout_constraintTop_toBottomOf="@id/til_ip_address" />
+        app:layout_constraintBottom_toBottomOf="parent" />
 </android.support.constraint.ConstraintLayout>
