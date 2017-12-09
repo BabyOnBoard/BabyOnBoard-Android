@@ -1,4 +1,4 @@
-package com.jonathanrufino.babyonboard.view;
+package com.jonathanrufino.babyonboard.util;
 
 import android.app.AlertDialog;
 import android.app.Dialog;

@@ -1,5 +1,8 @@
 package com.jonathanrufino.babyonboard.fragment;
 
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -11,11 +14,14 @@ import android.view.ViewGroup;
 import android.widget.NumberPicker;
 import android.widget.Toast;
 
+import com.jonathanrufino.babyonboard.MainActivity;
 import com.jonathanrufino.babyonboard.R;
-import com.jonathanrufino.babyonboard.view.TimerDialog;
 import com.jonathanrufino.babyonboard.model.BabyCrib;
+import com.jonathanrufino.babyonboard.model.Movement;
 import com.jonathanrufino.babyonboard.networking.APIClient;
 import com.jonathanrufino.babyonboard.networking.APIInterface;
+import com.jonathanrufino.babyonboard.util.SharedPreferencesHelper;
+import com.jonathanrufino.babyonboard.util.TimerDialog;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -28,9 +34,10 @@ public class BabyCribFragment extends Fragment implements NumberPicker.OnValueCh
 
     private CardView vibrationCV;
     private CardView frontCV;
-    private CardView assisYCV;
+    private CardView sideCV;
 
     private APIInterface apiInterface;
+    private Context context;
     private String movement;
 
     @Nullable
@@ -42,40 +49,61 @@ public class BabyCribFragment extends Fragment implements NumberPicker.OnValueCh
         vibrationCV.setOnClickListener(this);
         frontCV = view.findViewById(R.id.front_cv);
         frontCV.setOnClickListener(this);
-        assisYCV = view.findViewById(R.id.side_cv);
-        assisYCV.setOnClickListener(this);
+        sideCV = view.findViewById(R.id.side_cv);
+        sideCV.setOnClickListener(this);
 
         return view;
     }
 
     @Override
-    public void onValueChange(NumberPicker numberPicker, int i, int i1) {
-        BabyCrib babyCrib = new BabyCrib(movement, numberPicker.getValue());
+    public void onAttach(Context context) {
+        super.onAttach(context);
 
-        Call<BabyCrib> callMovement = apiInterface.setMovement(babyCrib);
-        callMovement.enqueue(new Callback<BabyCrib>() {
-            @Override
-            public void onResponse(@NonNull Call<BabyCrib> call, @NonNull Response<BabyCrib> response) {
-                BabyCrib movement = response.body();
-
-                if (movement != null && !movement.getStatus().equals("resting")) {
-                    Toast.makeText(getActivity(), "Berço em movimentação", Toast.LENGTH_SHORT).show();
-                } else {
-                    Toast.makeText(getActivity(), "Não foi possível iniciar a movimentação.", Toast.LENGTH_SHORT).show();
-                }
-            }
-
-            @Override
-            public void onFailure(@NonNull Call<BabyCrib> call, @NonNull Throwable t) {
-                Toast.makeText(getActivity(), "Não foi possível conectar ao berço.", Toast.LENGTH_SHORT).show();
-            }
-        });
+        this.context = context;
     }
 
-    public void showNumberPicker(View view) {
-        TimerDialog newFragment = new TimerDialog();
-        newFragment.setValueChangeListener(this);
-        newFragment.show(getActivity().getSupportFragmentManager(), "timer");
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        String ip = SharedPreferencesHelper.getSharedPreferenceString(context, context.getString(R.string.shared_pref_ip), "");
+
+        if (ip != null && !ip.isEmpty()) {
+            apiInterface = APIClient.getClient(ip).create(APIInterface.class);
+
+            Call<Movement> callMovement = apiInterface.getMovement();
+            callMovement.enqueue(new Callback<Movement>() {
+                @Override
+                public void onResponse(@NonNull Call<Movement> call, @NonNull Response<Movement> response) {
+                    Movement movement = response.body();
+
+                    if (movement != null) {
+                        if (movement.getRemainingTime() > 0) {
+                            getDialog().show();
+
+                            switch (movement.getMovement()) {
+                                case "vibration":
+                                    disableMovementControl(true);
+                                    break;
+                                case "front":
+                                    disableMovementControl(true);
+                                    break;
+                                case "side":
+                                    disableMovementControl(true);
+                                    break;
+                            }
+                        } else {
+                            disableMovementControl(false);
+                        }
+                    }
+                }
+
+                @Override
+                public void onFailure(@NonNull Call<Movement> call, @NonNull Throwable t) {
+                    Toast.makeText(context, "Não foi possível conectar ao berço.", Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
     }
 
     @Override
@@ -95,32 +123,61 @@ public class BabyCribFragment extends Fragment implements NumberPicker.OnValueCh
                 break;
         }
 
-        showNumberPicker(view);
+        showNumberPicker();
     }
 
     @Override
-    public void onStart() {
-        super.onStart();
+    public void onValueChange(NumberPicker numberPicker, int i, int i1) {
+        BabyCrib babyCrib = new BabyCrib(movement, numberPicker.getValue());
 
-        apiInterface = APIClient.getClient().create(APIInterface.class);
-
-        Call<BabyCrib> callMovement = apiInterface.getMovement();
+        Call<BabyCrib> callMovement = apiInterface.setMovement(babyCrib);
         callMovement.enqueue(new Callback<BabyCrib>() {
             @Override
             public void onResponse(@NonNull Call<BabyCrib> call, @NonNull Response<BabyCrib> response) {
                 BabyCrib movement = response.body();
 
-                if (movement != null) {
-                    Toast.makeText(getActivity(), "O besço já está em movimento, aguarde.", Toast.LENGTH_SHORT).show();
+                if (movement != null && !movement.getStatus().equals("resting")) {
+                    Toast.makeText(context, "Berço em movimentação", Toast.LENGTH_SHORT).show();
                 } else {
-                    Toast.makeText(getActivity(), "Não existem registros de movimentação.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, "Não foi possível iniciar a movimentação.", Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
             public void onFailure(@NonNull Call<BabyCrib> call, @NonNull Throwable t) {
-                Toast.makeText(getActivity(), "Não foi possível conectar ao berço.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, "Não foi possível conectar ao berço.", Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    public void showNumberPicker() {
+        TimerDialog newFragment = new TimerDialog();
+        newFragment.setValueChangeListener(this);
+        newFragment.show(((MainActivity) context).getSupportFragmentManager(), "timer");
+    }
+
+    private AlertDialog getDialog() {
+        AlertDialog.Builder alertBuilder = new AlertDialog.Builder(context)
+                .setTitle("Berço em Movimento")
+                .setMessage("O berço já está em movimento, aguarde o termíno da movimentação")
+                .setPositiveButton(context.getString(R.string.ok), new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.dismiss();
+                    }
+                });
+        return alertBuilder.create();
+    }
+
+    private void disableMovementControl(boolean disable) {
+        if (disable) {
+            vibrationCV.setEnabled(false);
+            frontCV.setEnabled(false);
+            sideCV.setEnabled(false);
+        } else {
+            vibrationCV.setEnabled(true);
+            frontCV.setEnabled(true);
+            sideCV.setEnabled(true);
+        }
     }
 }
