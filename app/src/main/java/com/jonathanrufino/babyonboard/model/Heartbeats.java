@@ -8,16 +8,13 @@ public class Heartbeats {
     private int id;
     @SerializedName("beats")
     private int beats;
-    @SerializedName("date")
-    private String date;
-    @SerializedName("time")
-    public String time;
+    @SerializedName("datetime")
+    private String datetime;
 
-    public Heartbeats(int id, int beats, String date, String time) {
+    public Heartbeats(int id, int beats, String datetime) {
         this.id = id;
         this.beats = beats;
-        this.date = date;
-        this.time = time;
+        this.datetime = datetime;
     }
 
     public int getId() {
@@ -36,19 +33,11 @@ public class Heartbeats {
         this.beats = beats;
     }
 
-    public String getDate() {
-        return date;
+    public String getDatetime() {
+        return datetime;
     }
 
-    public void setDate(String date) {
-        this.date = date;
-    }
-
-    public String getTime() {
-        return time;
-    }
-
-    public void setTime(String time) {
-        this.time = time;
+    public void setDatetime(String datetime) {
+        this.datetime = datetime;
     }
 }

@@ -6,18 +6,15 @@ public class Breathing {
 
     @SerializedName("id")
     private int id;
-    @SerializedName("is_breathing")
-    private boolean isBreathing;
-    @SerializedName("date")
-    private String date;
-    @SerializedName("time")
-    public String time;
+    @SerializedName("status")
+    private String status;
+    @SerializedName("datetime")
+    private String datetime;
 
-    public Breathing(int id, boolean isBreathing, String date, String time) {
+    public Breathing(int id, String status, String datetime) {
         this.id = id;
-        this.isBreathing = isBreathing;
-        this.date = date;
-        this.time = time;
+        this.status = status;
+        this.datetime = datetime;
     }
 
     public int getId() {
@@ -28,27 +25,19 @@ public class Breathing {
         this.id = id;
     }
 
-    public boolean isBreathing() {
-        return isBreathing;
+    public String getStatus() {
+        return status;
     }
 
-    public void setBreathing(boolean breathing) {
-        isBreathing = breathing;
+    public void setStatus(String status) {
+        this.status = status;
     }
 
-    public String getDate() {
-        return date;
+    public String getDatetime() {
+        return datetime;
     }
 
-    public void setDate(String date) {
-        this.date = date;
-    }
-
-    public String getTime() {
-        return time;
-    }
-
-    public void setTime(String time) {
-        this.time = time;
+    public void setDatetime(String datetime) {
+        this.datetime = datetime;
     }
 }

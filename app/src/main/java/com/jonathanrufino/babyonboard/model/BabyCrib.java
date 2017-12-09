@@ -10,17 +10,14 @@ public class BabyCrib {
     private String status;
     @SerializedName("duration")
     private int duration;
-    @SerializedName("date")
-    private String date;
-    @SerializedName("time")
-    public String time;
+    @SerializedName("datetime")
+    private String datetime;
 
-    public BabyCrib(int id, String status, int duration, String date, String time) {
+    public BabyCrib(int id, String status, int duration, String datetime) {
         this.id = id;
         this.status = status;
         this.duration = duration;
-        this.date = date;
-        this.time = time;
+        this.datetime = datetime;
     }
 
     public BabyCrib(String status, int duration) {
@@ -52,19 +49,11 @@ public class BabyCrib {
         this.duration = duration;
     }
 
-    public String getDate() {
-        return date;
+    public String getDatetime() {
+        return datetime;
     }
 
-    public void setDate(String date) {
-        this.date = date;
-    }
-
-    public String getTime() {
-        return time;
-    }
-
-    public void setTime(String time) {
-        this.time = time;
+    public void setDatetime(String datetime) {
+        this.datetime = datetime;
     }
 }

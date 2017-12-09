@@ -8,16 +8,13 @@ public class Temperature {
     private int id;
     @SerializedName("temperature")
     private String temperature;
-    @SerializedName("date")
-    private String date;
-    @SerializedName("time")
-    public String time;
+    @SerializedName("datetime")
+    private String datetime;
 
-    public Temperature(int id, String temperature, String date, String time) {
+    public Temperature(int id, String temperature, String datetime) {
         this.id = id;
         this.temperature = temperature;
-        this.date = date;
-        this.time = time;
+        this.datetime = datetime;
     }
 
     public int getId() {
@@ -36,19 +33,11 @@ public class Temperature {
         this.temperature = temperature;
     }
 
-    public String getDate() {
-        return date;
+    public String getDatetime() {
+        return datetime;
     }
 
-    public void setDate(String date) {
-        this.date = date;
-    }
-
-    public String getTime() {
-        return time;
-    }
-
-    public void setTime(String time) {
-        this.time = time;
+    public void setDatetime(String datetime) {
+        this.datetime = datetime;
     }
 }
