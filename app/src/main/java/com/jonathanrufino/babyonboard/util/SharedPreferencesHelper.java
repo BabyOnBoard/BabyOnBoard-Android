@@ -1,7 +1,9 @@
-package com.jonathanrufino.babyonboard;
+package com.jonathanrufino.babyonboard.util;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+
+import com.jonathanrufino.babyonboard.R;
 
 public class SharedPreferencesHelper {
 
